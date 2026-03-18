@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<stamps>
+  <stamp>
+    <code>126</code>
+    <country>Albania</country>
+    <denomination>15 p</denomination>
+    <condition>Mint H</condition>
+    <perforations>115x115</perforations>
+    <watermark>12</watermark>
+    <colors>blue, yellow</colors>
+    <watermark_image>/home/tomca/Obrázky/55086354717_2d243c5da8_o.jpg</watermark_image>
+    <notes>neco 2</notes>
+    <created>2026-03-18 12:45:38</created>
+  </stamp>
+  <stamp>
+    <code>127</code>
+    <country>Albania</country>
+    <denomination>15 p</denomination>
+    <condition>Very Fine</condition>
+    <perforations>115x115</perforations>
+    <watermark>12</watermark>
+    <colors>blue, white</colors>
+    <watermark_image>/home/tomca/Obrázky/55086354717_2d243c5da8_o.jpg</watermark_image>
+    <notes/>
+    <created>2026-03-18 12:47:56</created>
+  </stamp>
+  <stamp>
+    <code>128</code>
+    <country>Albania</country>
+    <denomination>20 p</denomination>
+    <condition>Fine</condition>
+    <perforations>115x115</perforations>
+    <watermark>12</watermark>
+    <colors>red, orange</colors>
+    <watermark_image>/home/tomca/Obrázky/55086354717_2d243c5da8_o.jpg</watermark_image>
+    <notes/>
+    <created>2026-03-18 12:48:32</created>
+  </stamp>
+  <stamp>
+    <code>129</code>
+    <country>Albania</country>
+    <denomination>12 p</denomination>
+    <condition>Very Good</condition>
+    <perforations>115x110</perforations>
+    <watermark>13</watermark>
+    <colors>orange, green</colors>
+    <watermark_image>/home/tomca/Obrázky/55087244311_ec3da30526_o.jpg</watermark_image>
+    <notes>koon</notes>
+    <created>2026-03-18 12:49:50</created>
+  </stamp>
+</stamps>

@@ -6,6 +6,12 @@ from xml.dom import minidom
 from datetime import datetime
 import os
 
+try:
+    from PIL import Image, ImageTk
+    _PIL_AVAILABLE = True
+except ImportError:
+    _PIL_AVAILABLE = False
+
 COUNTRIES = [
     "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina",
     "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
@@ -47,6 +53,8 @@ CONDITIONS = [
     "Good", "Used", "CTO", "Poor", "Damaged",
 ]
 
+CATALOGS = ["Scott (Sn)", "Stanley Gibbons (Sg)", "Michel (Mi)"]
+
 FIELDS = [
     ("Code:",         "code",         "entry_int"),
     ("Country:",      "country",      "combo_country"),
@@ -54,9 +62,8 @@ FIELDS = [
     ("Condition:",    "condition",    "combo_condition"),
     ("Perforations:", "perforations", "entry_perf"),
     ("Watermark:",    "watermark",    "entry_int"),
-    ("Color(s):",     "colors",       "entry"),
 ]
-FIELD_KEYS = [f[1] for f in FIELDS] + ["notes", "created"]
+FIELD_KEYS = [f[1] for f in FIELDS] + ["catalog_type", "catalog_number", "colors", "watermark_image", "stamp_image", "notes", "created"]
 REQUIRED_FIELDS = ("code", "country", "condition", "colors")
 
 
@@ -194,7 +201,60 @@ class StampApp(tk.Tk):
                 ttk.Combobox(right, textvariable=var, values=CONDITIONS, width=28).grid(
                     row=row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
 
-        notes_row = len(FIELDS)
+        catalog_row = len(FIELDS)
+        ttk.Label(right, text="Catalog:").grid(row=catalog_row, column=0, sticky=tk.W, pady=3)
+        catalog_frame = ttk.Frame(right)
+        catalog_frame.grid(row=catalog_row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
+        catalog_type_var = tk.StringVar()
+        self.vars["catalog_type"] = catalog_type_var
+        ttk.Combobox(catalog_frame, textvariable=catalog_type_var,
+                     values=CATALOGS, width=18).pack(side=tk.LEFT)
+        ttk.Label(catalog_frame, text="No:").pack(side=tk.LEFT, padx=(8, 4))
+        catalog_number_var = tk.StringVar()
+        self.vars["catalog_number"] = catalog_number_var
+        ttk.Entry(catalog_frame, textvariable=catalog_number_var, width=10).pack(side=tk.LEFT)
+
+        wm_img_row = len(FIELDS) + 1
+        ttk.Label(right, text="Watermark image:").grid(row=wm_img_row, column=0, sticky=tk.W, pady=3)
+        wm_img_frame = ttk.Frame(right)
+        wm_img_frame.grid(row=wm_img_row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
+        self.watermark_image_var = tk.StringVar()
+        wm_entry = ttk.Entry(wm_img_frame, textvariable=self.watermark_image_var,
+                             width=20, state="readonly")
+        wm_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        ttk.Button(wm_img_frame, text="Browse…",
+                   command=self._browse_watermark_image).pack(side=tk.LEFT, padx=(4, 0))
+        ttk.Button(wm_img_frame, text="Clear",
+                   command=self._clear_watermark_image).pack(side=tk.LEFT, padx=(2, 0))
+
+        self._wm_photo = None
+        self.wm_preview = ttk.Label(right)
+        self.wm_preview.grid(row=wm_img_row + 1, column=1, sticky=tk.W, padx=(8, 0), pady=(0, 3))
+
+        colors_row = len(FIELDS) + 3
+        ttk.Label(right, text="Color(s):").grid(row=colors_row, column=0, sticky=tk.W, pady=3)
+        colors_var = tk.StringVar()
+        self.vars["colors"] = colors_var
+        ttk.Entry(right, textvariable=colors_var, width=30).grid(
+            row=colors_row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
+
+        stamp_img_row = len(FIELDS) + 4
+        ttk.Label(right, text="Stamp image:").grid(row=stamp_img_row, column=0, sticky=tk.W, pady=3)
+        stamp_img_frame = ttk.Frame(right)
+        stamp_img_frame.grid(row=stamp_img_row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
+        self.stamp_image_var = tk.StringVar()
+        ttk.Entry(stamp_img_frame, textvariable=self.stamp_image_var,
+                  width=20, state="readonly").pack(side=tk.LEFT, fill=tk.X, expand=True)
+        ttk.Button(stamp_img_frame, text="Browse…",
+                   command=self._browse_stamp_image).pack(side=tk.LEFT, padx=(4, 0))
+        ttk.Button(stamp_img_frame, text="Clear",
+                   command=self._clear_stamp_image).pack(side=tk.LEFT, padx=(2, 0))
+
+        self._stamp_photo = None
+        self.stamp_preview = ttk.Label(right)
+        self.stamp_preview.grid(row=stamp_img_row + 1, column=1, sticky=tk.W, padx=(8, 0), pady=(0, 3))
+
+        notes_row = len(FIELDS) + 6
         ttk.Label(right, text="Notes:").grid(row=notes_row, column=0, sticky=tk.NW, pady=3)
         notes_wrap = ttk.Frame(right)
         notes_wrap.grid(row=notes_row, column=1, sticky=tk.NSEW, padx=(8, 0), pady=3)
@@ -225,6 +285,77 @@ class StampApp(tk.Tk):
         ttk.Label(self, textvariable=self.status_var, relief=tk.SUNKEN, anchor=tk.W).pack(
             side=tk.BOTTOM, fill=tk.X, padx=6, pady=(0, 3))
 
+    # ── Watermark image helpers ───────────────────────────────────────────────
+
+    def _browse_watermark_image(self):
+        path = filedialog.askopenfilename(
+            title="Select Watermark Image",
+            filetypes=[
+                ("Image files", "*.png *.jpg *.jpeg *.gif *.bmp *.tiff *.webp"),
+                ("All files", "*.*"),
+            ],
+        )
+        if path:
+            self.watermark_image_var.set(path)
+            self._update_wm_preview(path)
+
+    def _clear_watermark_image(self):
+        self.watermark_image_var.set("")
+        self._update_wm_preview("")
+
+    def _update_wm_preview(self, path):
+        if not path or not os.path.isfile(path):
+            self.wm_preview.configure(image="", text="")
+            self._wm_photo = None
+            return
+        if _PIL_AVAILABLE:
+            try:
+                img = Image.open(path)
+                img.thumbnail((120, 120))
+                self._wm_photo = ImageTk.PhotoImage(img)
+                self.wm_preview.configure(image=self._wm_photo, text="")
+                return
+            except Exception:
+                pass
+        # Fallback: show filename only
+        self._wm_photo = None
+        self.wm_preview.configure(image="", text=os.path.basename(path))
+
+    # ── Stamp image helpers ───────────────────────────────────────────────────
+
+    def _browse_stamp_image(self):
+        path = filedialog.askopenfilename(
+            title="Select Stamp Image",
+            filetypes=[
+                ("Image files", "*.png *.jpg *.jpeg *.gif *.bmp *.tiff *.webp"),
+                ("All files", "*.*"),
+            ],
+        )
+        if path:
+            self.stamp_image_var.set(path)
+            self._update_stamp_preview(path)
+
+    def _clear_stamp_image(self):
+        self.stamp_image_var.set("")
+        self._update_stamp_preview("")
+
+    def _update_stamp_preview(self, path):
+        if not path or not os.path.isfile(path):
+            self.stamp_preview.configure(image="", text="")
+            self._stamp_photo = None
+            return
+        if _PIL_AVAILABLE:
+            try:
+                img = Image.open(path)
+                img.thumbnail((120, 120))
+                self._stamp_photo = ImageTk.PhotoImage(img)
+                self.stamp_preview.configure(image=self._stamp_photo, text="")
+                return
+            except Exception:
+                pass
+        self._stamp_photo = None
+        self.stamp_preview.configure(image="", text=os.path.basename(path))
+
     # ── Tree helpers ──────────────────────────────────────────────────────────
 
     def _refresh_tree(self):
@@ -248,9 +379,17 @@ class StampApp(tk.Tk):
         self.notes_text.delete("1.0", tk.END)
         self.notes_text.insert("1.0", stamp.get("notes", ""))
         self.created_var.set(stamp.get("created", ""))
+        wm_img = stamp.get("watermark_image", "")
+        self.watermark_image_var.set(wm_img)
+        self._update_wm_preview(wm_img)
+        st_img = stamp.get("stamp_image", "")
+        self.stamp_image_var.set(st_img)
+        self._update_stamp_preview(st_img)
 
     def _read_form(self):
         stamp = {key: var.get().strip() for key, var in self.vars.items()}
+        stamp["watermark_image"] = self.watermark_image_var.get().strip()
+        stamp["stamp_image"] = self.stamp_image_var.get().strip()
         stamp["notes"] = self.notes_text.get("1.0", tk.END).strip()
         return stamp
 
@@ -266,6 +405,8 @@ class StampApp(tk.Tk):
             var.set("")
         self.notes_text.delete("1.0", tk.END)
         self.created_var.set("")
+        self._clear_watermark_image()
+        self._clear_stamp_image()
 
     def action_save_record(self):
         stamp = self._read_form()
