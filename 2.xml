@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<stamps>
+  <stamp>
+    <code>1</code>
+    <country>Algeria</country>
+    <denomination>1 zl</denomination>
+    <condition>Fine</condition>
+    <perforations>12 x 12</perforations>
+    <watermark>154</watermark>
+    <colors>red, blue</colors>
+    <notes>big value</notes>
+    <created>2026-03-16 22:33:43</created>
+  </stamp>
+  <stamp>
+    <code>3</code>
+    <country>Andorra</country>
+    <denomination>5 Sh</denomination>
+    <condition>Used</condition>
+    <perforations>no</perforations>
+    <watermark>54</watermark>
+    <colors>red, gold</colors>
+    <notes>what is it?</notes>
+    <created>2026-03-16 22:35:04</created>
+  </stamp>
+  <stamp>
+    <code>4</code>
+    <country>Andorra</country>
+    <denomination>5 F</denomination>
+    <condition>Very Good</condition>
+    <perforations>11 x 11</perforations>
+    <watermark/>
+    <colors>blue, black, white</colors>
+    <notes>?</notes>
+    <created>2026-03-16 22:36:53</created>
+  </stamp>
+</stamps>

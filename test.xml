@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<stamps>
+  <stamp>
+    <code>1</code>
+    <country>Algeria</country>
+    <denomination>1 zl</denomination>
+    <condition>Fine</condition>
+    <perforations>12 x 12</perforations>
+    <watermark>154</watermark>
+    <colors>red, blue</colors>
+    <notes>big value</notes>
+    <created>2026-03-16 22:33:43</created>
+  </stamp>
+  <stamp>
+    <code>2</code>
+    <country>Czech Republic</country>
+    <denomination>10 Kč</denomination>
+    <condition>Very Fine</condition>
+    <perforations>10 x 11,5</perforations>
+    <watermark/>
+    <colors>blue, white</colors>
+    <notes>naše česká</notes>
+    <created>2026-03-16 22:35:04</created>
+  </stamp>
+</stamps>
