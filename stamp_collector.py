@@ -70,7 +70,7 @@ REQUIRED_FIELDS = ("code", "country", "condition", "colors")
 class StampApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Stamp Collector")
+        self.title("Stamp Data Collector")
         self.geometry("960x580")
         self.minsize(720, 460)
 
@@ -113,8 +113,8 @@ class StampApp(tk.Tk):
 
     def help_about(self):
         messagebox.showinfo(
-            "About Stamp Collector",
-            "Stamp Collector\nVersion 1.0\n\n"
+            "About Stamp Data Collector",
+            "Stamp Data Collector\nVersion 2.0\n\n"
             "A desktop application for managing\n"
             "a personal stamp collection.\n\n"
             "Data is stored in XML format and\n"
@@ -530,7 +530,7 @@ class StampApp(tk.Tk):
 
     def _update_title(self):
         name = os.path.basename(self.current_file) if self.current_file else "Untitled"
-        self.title(f"Stamp Collector — {name}")
+        self.title(f"Stamp Data Collector — {name}")
 
 
 # ── XML helpers ───────────────────────────────────────────────────────────────

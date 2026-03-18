@@ -1,8 +1,8 @@
-# Stamp Collector — User Guide
+# Stamp Data Collector — User Guide
 
 ## Overview
 
-Stamp Collector is a desktop application for managing a personal stamp collection. Data is stored in XML format and can also be exported to CSV.
+Stamp Data Collector is a desktop application for managing a personal stamp collection. Data is stored in XML format and can also be exported to CSV.
 
 ---
 
@@ -56,7 +56,10 @@ python stamp_collector.py
 | **Condition** | Yes | Select from the dropdown list |
 | **Perforations** | No | Two integers separated by `x` (e.g. `11x14`) |
 | **Watermark** | No | Integer code only (e.g. `7`) |
+| **Catalog** | No | Select type (Scott, Stanley Gibbons, Michel) and enter catalog number |
+| **Watermark image** | No | Image file attached via Browse button (PNG, JPG, etc.) |
 | **Color(s)** | Yes | Free text (e.g. `red`, `blue and green`) |
+| **Stamp image** | No | Image file attached via Browse button (PNG, JPG, etc.) |
 | **Notes** | No | Free text, multi-line |
 
 ### Condition values
