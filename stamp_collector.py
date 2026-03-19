@@ -24,55 +24,12 @@ def _save_countries(countries: list) -> None:
         json.dump(sorted(countries), f, ensure_ascii=False, indent=2)
 
 
-_BUILTIN_COUNTRIES = [
-    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina",
-    "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
-    "Bangladesh", "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
-    "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
-    "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada",
-    "Cape Verde", "Central African Republic", "Chad", "Chile", "China",
-    "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba",
-    "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica",
-    "Dominican Republic", "Ecuador", "Egypt", "El Salvador",
-    "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Fiji",
-    "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana",
-    "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
-    "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
-    "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan",
-    "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
-    "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya",
-    "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi",
-    "Malaysia", "Maldives", "Mali", "Malta", "Mauritania", "Mauritius",
-    "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco",
-    "Mozambique", "Myanmar", "Namibia", "Nepal", "Netherlands",
-    "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea",
-    "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Panama",
-    "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland",
-    "Portugal", "Qatar", "Romania", "Russia", "Rwanda",
-    "San Marino", "Saudi Arabia", "Senegal", "Serbia", "Sierra Leone",
-    "Singapore", "Slovakia", "Slovenia", "Somalia", "South Africa",
-    "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan",
-    "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
-    "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga",
-    "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Uganda",
-    "Ukraine", "United Arab Emirates", "United Kingdom", "United States",
-    "Uruguay", "Uzbekistan", "Venezuela", "Vietnam", "Yemen",
-    "Zambia", "Zimbabwe",
-]
-
-
 def _load_countries() -> list:
-    if os.path.isfile(_COUNTRIES_FILE):
-        try:
-            with open(_COUNTRIES_FILE, encoding="utf-8") as f:
-                data = json.load(f)
-            if isinstance(data, list):
-                return data
-        except Exception:
-            pass
-    # First run: seed from built-in list, save, and return
-    _save_countries(_BUILTIN_COUNTRIES)
-    return sorted(_BUILTIN_COUNTRIES)
+    try:
+        with open(_COUNTRIES_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as exc:
+        raise RuntimeError(f"Could not load {_COUNTRIES_FILE}: {exc}") from exc
 
 
 COUNTRIES = _load_countries()
