@@ -12,31 +12,19 @@ try:
 except ImportError:
     _PIL_AVAILABLE = False
 
-_CUSTOM_COUNTRIES_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "custom_countries.json"
+import json
+
+_COUNTRIES_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "countries.json"
 )
 
 
-def _load_custom_countries() -> list:
-    import json
-    if os.path.isfile(_CUSTOM_COUNTRIES_FILE):
-        try:
-            with open(_CUSTOM_COUNTRIES_FILE, encoding="utf-8") as f:
-                data = json.load(f)
-            if isinstance(data, list):
-                return data
-        except Exception:
-            pass
-    return []
+def _save_countries(countries: list) -> None:
+    with open(_COUNTRIES_FILE, "w", encoding="utf-8") as f:
+        json.dump(sorted(countries), f, ensure_ascii=False, indent=2)
 
 
-def _save_custom_countries(countries: list) -> None:
-    import json
-    with open(_CUSTOM_COUNTRIES_FILE, "w", encoding="utf-8") as f:
-        json.dump(countries, f, ensure_ascii=False, indent=2)
-
-
-COUNTRIES = [
+_BUILTIN_COUNTRIES = [
     "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina",
     "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
     "Bangladesh", "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
@@ -71,7 +59,23 @@ COUNTRIES = [
     "Uruguay", "Uzbekistan", "Venezuela", "Vietnam", "Yemen",
     "Zambia", "Zimbabwe",
 ]
-COUNTRIES.extend(c for c in _load_custom_countries() if c not in COUNTRIES)
+
+
+def _load_countries() -> list:
+    if os.path.isfile(_COUNTRIES_FILE):
+        try:
+            with open(_COUNTRIES_FILE, encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, list):
+                return data
+        except Exception:
+            pass
+    # First run: seed from built-in list, save, and return
+    _save_countries(_BUILTIN_COUNTRIES)
+    return sorted(_BUILTIN_COUNTRIES)
+
+
+COUNTRIES = _load_countries()
 
 CONDITIONS = [
     "Mint NH", "Mint H", "Very Fine", "Fine", "Very Good",
@@ -159,15 +163,11 @@ class StampApp(tk.Tk):
             return
         COUNTRIES.append(name)
         COUNTRIES.sort()
-        custom = _load_custom_countries()
-        if name not in custom:
-            custom.append(name)
-            _save_custom_countries(custom)
+        _save_countries(COUNTRIES)
+        self.country_combo.configure(values=COUNTRIES)
         messagebox.showinfo(
             "Add new country",
-            f"'{name}' has been added.\n\n"
-            "Please restart the application to see the updated\n"
-            "country list in the dropdown.",
+            f"'{name}' has been added to the country list.",
         )
 
     def help_about(self):
@@ -254,8 +254,8 @@ class StampApp(tk.Tk):
                           validate="key", validatecommand=vcmd_perf).grid(
                     row=row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
             elif wtype == "combo_country":
-                ttk.Combobox(right, textvariable=var, values=COUNTRIES, width=28).grid(
-                    row=row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
+                self.country_combo = ttk.Combobox(right, textvariable=var, values=COUNTRIES, width=28)
+                self.country_combo.grid(row=row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
             elif wtype == "combo_condition":
                 ttk.Combobox(right, textvariable=var, values=CONDITIONS, width=28).grid(
                     row=row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
