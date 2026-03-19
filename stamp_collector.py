@@ -243,18 +243,7 @@ class StampApp(tk.Tk):
         ttk.Button(wm_img_frame, text="Clear",
                    command=self._clear_watermark_image).pack(side=tk.LEFT, padx=(2, 0))
 
-        self._wm_photo = None
-        self.wm_preview = ttk.Label(right)
-        self.wm_preview.grid(row=wm_img_row + 1, column=1, sticky=tk.W, padx=(8, 0), pady=(0, 3))
-
-        colors_row = len(FIELDS) + 3
-        ttk.Label(right, text="Color(s):").grid(row=colors_row, column=0, sticky=tk.W, pady=3)
-        colors_var = tk.StringVar()
-        self.vars["colors"] = colors_var
-        ttk.Entry(right, textvariable=colors_var, width=30).grid(
-            row=colors_row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
-
-        stamp_img_row = len(FIELDS) + 4
+        stamp_img_row = len(FIELDS) + 2
         ttk.Label(right, text="Stamp image:").grid(row=stamp_img_row, column=0, sticky=tk.W, pady=3)
         stamp_img_frame = ttk.Frame(right)
         stamp_img_frame.grid(row=stamp_img_row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
@@ -266,11 +255,24 @@ class StampApp(tk.Tk):
         ttk.Button(stamp_img_frame, text="Clear",
                    command=self._clear_stamp_image).pack(side=tk.LEFT, padx=(2, 0))
 
+        preview_row = len(FIELDS) + 3
+        preview_frame = ttk.Frame(right)
+        preview_frame.grid(row=preview_row, column=0, columnspan=2, sticky=tk.W, padx=(8, 0), pady=(0, 3))
+        self._wm_photo = None
+        self.wm_preview = ttk.Label(preview_frame)
+        self.wm_preview.pack(side=tk.LEFT, padx=(0, 12))
         self._stamp_photo = None
-        self.stamp_preview = ttk.Label(right)
-        self.stamp_preview.grid(row=stamp_img_row + 1, column=1, sticky=tk.W, padx=(8, 0), pady=(0, 3))
+        self.stamp_preview = ttk.Label(preview_frame)
+        self.stamp_preview.pack(side=tk.LEFT)
 
-        notes_row = len(FIELDS) + 6
+        colors_row = len(FIELDS) + 4
+        ttk.Label(right, text="Color(s):").grid(row=colors_row, column=0, sticky=tk.W, pady=3)
+        colors_var = tk.StringVar()
+        self.vars["colors"] = colors_var
+        ttk.Entry(right, textvariable=colors_var, width=30).grid(
+            row=colors_row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
+
+        notes_row = len(FIELDS) + 5
         ttk.Label(right, text="Notes:").grid(row=notes_row, column=0, sticky=tk.NW, pady=3)
         notes_wrap = ttk.Frame(right)
         notes_wrap.grid(row=notes_row, column=1, sticky=tk.NSEW, padx=(8, 0), pady=3)
