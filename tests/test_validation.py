@@ -46,7 +46,7 @@ def valid_stamp():
         "code": "42",
         "country": "Poland",
         "denomination": "1 zl",
-        "condition": "Fine",
+        "condition": "MNH-VF",
         "perforations": "11x14",
         "watermark": "",
         "colors": "red, blue",
@@ -130,7 +130,7 @@ def test_condition_all_valid_values(valid_stamp, condition):
     assert validate_stamp(valid_stamp) == []
 
 
-@pytest.mark.parametrize("condition", ["Perfect", "NM", "fine", "USED"])
+@pytest.mark.parametrize("condition", ["Fine", "Perfect", "NM", "Used", "Mint NH"])
 def test_condition_invalid(valid_stamp, condition):
     valid_stamp["condition"] = condition
     errors = validate_stamp(valid_stamp)

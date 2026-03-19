@@ -35,8 +35,8 @@ def _load_countries() -> list:
 COUNTRIES = _load_countries()
 
 CONDITIONS = [
-    "Mint NH", "Mint H", "Very Fine", "Fine", "Very Good",
-    "Good", "Used", "CTO", "Poor", "Damaged",
+    "MH-VG", "MH-VF", "MH-F", "MH-XF", "MNH-VG", "MNH-VF", "MNH-F", "MNH-XF",
+    "Used-VG", "Used-VF", "Used-F", "Used-XF",
 ]
 
 CATALOGS = ["Scott (Sn)", "Stanley Gibbons (Sg)", "Michel (Mi)"]
