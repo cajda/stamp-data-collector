@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox, filedialog, simpledialog
 import csv
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
@@ -11,6 +11,30 @@ try:
     _PIL_AVAILABLE = True
 except ImportError:
     _PIL_AVAILABLE = False
+
+_CUSTOM_COUNTRIES_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "custom_countries.json"
+)
+
+
+def _load_custom_countries() -> list:
+    import json
+    if os.path.isfile(_CUSTOM_COUNTRIES_FILE):
+        try:
+            with open(_CUSTOM_COUNTRIES_FILE, encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, list):
+                return data
+        except Exception:
+            pass
+    return []
+
+
+def _save_custom_countries(countries: list) -> None:
+    import json
+    with open(_CUSTOM_COUNTRIES_FILE, "w", encoding="utf-8") as f:
+        json.dump(countries, f, ensure_ascii=False, indent=2)
+
 
 COUNTRIES = [
     "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina",
@@ -47,6 +71,7 @@ COUNTRIES = [
     "Uruguay", "Uzbekistan", "Venezuela", "Vietnam", "Yemen",
     "Zambia", "Zimbabwe",
 ]
+COUNTRIES.extend(c for c in _load_custom_countries() if c not in COUNTRIES)
 
 CONDITIONS = [
     "Mint NH", "Mint H", "Very Fine", "Fine", "Very Good",
@@ -99,6 +124,10 @@ class StampApp(tk.Tk):
         file_menu.add_command(label="Exit",       command=self.quit)
         menubar.add_cascade(label="File", menu=file_menu)
 
+        edit_menu = tk.Menu(menubar, tearoff=0)
+        edit_menu.add_command(label="Add new country…", command=self.edit_add_country)
+        menubar.add_cascade(label="Edit", menu=edit_menu)
+
         help_menu = tk.Menu(menubar, tearoff=0)
         help_menu.add_command(label="User Guide", command=self.help_user_guide, accelerator="F1")
         help_menu.add_separator()
@@ -110,6 +139,36 @@ class StampApp(tk.Tk):
         self.bind("<Control-n>", lambda e: self.file_new())
         self.bind("<Control-o>", lambda e: self.file_open())
         self.bind("<Control-s>", lambda e: self.file_save())
+
+    def edit_add_country(self):
+        name = simpledialog.askstring(
+            "Add new country",
+            "Enter the country name to add:",
+            parent=self,
+        )
+        if not name:
+            return
+        name = name.strip()
+        if not name:
+            return
+        if name in COUNTRIES:
+            messagebox.showinfo(
+                "Add new country",
+                f"'{name}' is already in the country list.",
+            )
+            return
+        COUNTRIES.append(name)
+        COUNTRIES.sort()
+        custom = _load_custom_countries()
+        if name not in custom:
+            custom.append(name)
+            _save_custom_countries(custom)
+        messagebox.showinfo(
+            "Add new country",
+            f"'{name}' has been added.\n\n"
+            "Please restart the application to see the updated\n"
+            "country list in the dropdown.",
+        )
 
     def help_about(self):
         messagebox.showinfo(
