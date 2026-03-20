@@ -578,6 +578,10 @@ def _load_xml(path):
     return stamps
 
 
-if __name__ == "__main__":
+def main():
     app = StampApp()
     app.mainloop()
+
+
+if __name__ == "__main__":
+    main()
