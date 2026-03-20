@@ -8,7 +8,29 @@ Stamp Data Collector is a desktop application for managing a personal stamp coll
 
 ## Getting Started
 
-Run the application:
+### Installation
+
+Install the package and its dependencies:
+
+```
+pip install .
+```
+
+For development (includes pytest):
+
+```
+pip install -r requirements-dev.txt
+```
+
+### Running the application
+
+After installation:
+
+```
+stamp-collector
+```
+
+Or run directly without installing:
 
 ```
 python stamp_collector.py
@@ -54,7 +76,7 @@ python stamp_collector.py
 | **Country** | Yes | Select from the dropdown list |
 | **Denomination** | No | Free text (e.g. `2c`, `0.50`) |
 | **Condition** | Yes | Select from the dropdown list |
-| **Perforations** | No | Two integers separated by `x` (e.g. `11x14`) |
+| **Perforations** | No | Float between 7 and 16.5 (e.g. `11`, `13.5`) |
 | **Watermark** | No | Integer code only (e.g. `7`) |
 | **Catalog** | No | Select type (Scott, Stanley Gibbons, Michel) and enter catalog number |
 | **Watermark image** | No | Image file attached via Browse button (PNG, JPG, etc.) |
@@ -70,7 +92,7 @@ python stamp_collector.py
 ## Input Rules
 
 - **Code** and **Watermark** fields only accept digits — letters and symbols are blocked at input.
-- **Perforations** only accepts digits and the letter `x`, with at most one `x`. On saving, the value must follow the `NxM` pattern (e.g. `11x14`). The field may be left empty.
+- **Perforations** accepts a decimal number between 7 and 16.5 (e.g. `11`, `13.5`). The field may be left empty.
 - Required fields (**Code**, **Country**, **Condition**, **Color(s)**) must be filled before a record can be saved.
 
 ---

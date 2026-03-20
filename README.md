@@ -12,10 +12,30 @@ A desktop application for managing a personal stamp collection. Built with Pytho
 
 ## Requirements
 
-- Python 3.x
-- Pillow (optional, for image preview): `pip install Pillow`
+- Python 3.8+
+- Pillow (optional, for image preview)
+
+## Installation
+
+```
+pip install .
+```
+
+Or install dependencies only:
+
+```
+pip install -r requirements.txt
+```
 
 ## Usage
+
+After installation:
+
+```
+stamp-collector
+```
+
+Or run directly:
 
 ```
 python stamp_collector.py
