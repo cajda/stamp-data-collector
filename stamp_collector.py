@@ -17,6 +17,10 @@ import json
 _COUNTRIES_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "countries.json"
 )
+_PERFORATIONS_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "perforations.json"
+)
+_DEFAULT_PERFORATIONS = ["Imperf.", "12x12", "13x13", "14x14", "13¾x14", "12½x13", "14x13¼"]
 
 
 def _save_countries(countries: list) -> None:
@@ -32,6 +36,19 @@ def _load_countries() -> list:
         raise RuntimeError(f"Could not load {_COUNTRIES_FILE}: {exc}") from exc
 
 
+def _save_perforations(perforations: list) -> None:
+    with open(_PERFORATIONS_FILE, "w", encoding="utf-8") as f:
+        json.dump(perforations, f, ensure_ascii=False, indent=2)
+
+
+def _load_perforations() -> list:
+    try:
+        with open(_PERFORATIONS_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, ValueError):
+        return list(_DEFAULT_PERFORATIONS)
+
+
 COUNTRIES = _load_countries()
 
 CONDITIONS = [
@@ -41,12 +58,14 @@ CONDITIONS = [
 
 CATALOGS = ["Scott (Sn)", "Stanley Gibbons (Sg)", "Michel (Mi)"]
 
+PERFORATIONS = _load_perforations()
+
 FIELDS = [
 ("Code:",         "code",         "entry_int"),
     ("Country:",      "country",      "combo_country"),
     ("Denomination:", "denomination", "entry"),
     ("Condition:",    "condition",    "combo_condition"),
-    ("Perforations:", "perforations", "entry_perf"),
+    ("Perforations:", "perforations", "combo_perf"),
     ("Watermark:",    "watermark",    "entry_int"),
 ]
 FIELD_KEYS = [f[1] for f in FIELDS] + ["catalog_type", "catalog_number", "colors", "watermark_image", "stamp_image", "notes", "created"]
@@ -87,6 +106,9 @@ class StampApp(tk.Tk):
 
         edit_menu = tk.Menu(menubar, tearoff=0)
         edit_menu.add_command(label="Add new country…", command=self.edit_add_country)
+        edit_menu.add_command(label="Delete countries…", command=self.edit_delete_countries)
+        edit_menu.add_command(label="Add new perforation…", command=self.edit_add_perforation)
+        edit_menu.add_command(label="Delete perforations…", command=self.edit_delete_perforations)
         menubar.add_cascade(label="Edit", menu=edit_menu)
 
         help_menu = tk.Menu(menubar, tearoff=0)
@@ -127,10 +149,127 @@ class StampApp(tk.Tk):
             f"'{name}' has been added to the country list.",
         )
 
+    def edit_delete_countries(self):
+        if not COUNTRIES:
+            messagebox.showinfo("Delete countries", "The country list is empty.")
+            return
+
+        dlg = tk.Toplevel(self)
+        dlg.title("Delete countries")
+        dlg.resizable(False, False)
+        dlg.grab_set()
+
+        ttk.Label(dlg, text="Select countries to remove:").pack(
+            anchor=tk.W, padx=12, pady=(10, 4))
+
+        container = ttk.Frame(dlg)
+        container.pack(padx=12, pady=4, fill=tk.BOTH, expand=True)
+
+        canvas = tk.Canvas(container, width=260, height=320, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(container, orient=tk.VERTICAL, command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        inner = ttk.Frame(canvas)
+        canvas.create_window((0, 0), window=inner, anchor=tk.NW)
+        inner.bind("<Configure>", lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")))
+
+        checks = {}
+        for value in COUNTRIES:
+            var = tk.BooleanVar()
+            ttk.Checkbutton(inner, text=value, variable=var).pack(anchor=tk.W)
+            checks[value] = var
+
+        btn_frame = ttk.Frame(dlg)
+        btn_frame.pack(padx=12, pady=(8, 12), fill=tk.X)
+
+        def on_delete():
+            to_remove = [v for v, var in checks.items() if var.get()]
+            if not to_remove:
+                messagebox.showwarning("Delete countries",
+                                       "No countries selected.", parent=dlg)
+                return
+            for v in to_remove:
+                COUNTRIES.remove(v)
+            _save_countries(COUNTRIES)
+            self.country_combo.configure(values=COUNTRIES)
+            dlg.destroy()
+
+        ttk.Button(btn_frame, text="Delete", command=on_delete).pack(side=tk.RIGHT, padx=(4, 0))
+        ttk.Button(btn_frame, text="Cancel", command=dlg.destroy).pack(side=tk.RIGHT)
+
+    def edit_add_perforation(self):
+        value = simpledialog.askstring(
+            "Add new perforation",
+            "Enter the perforation value to add:",
+            parent=self,
+        )
+        if not value:
+            return
+        value = value.strip()
+        if not value:
+            return
+        if value in PERFORATIONS:
+            messagebox.showinfo(
+                "Add new perforation",
+                f"'{value}' is already in the perforation list.",
+            )
+            return
+        PERFORATIONS.append(value)
+        PERFORATIONS.sort()
+        _save_perforations(PERFORATIONS)
+        self.perf_combo.configure(values=PERFORATIONS)
+        messagebox.showinfo(
+            "Add new perforation",
+            f"'{value}' has been added to the perforation list.",
+        )
+
+    def edit_delete_perforations(self):
+        if not PERFORATIONS:
+            messagebox.showinfo("Delete perforations", "The perforation list is empty.")
+            return
+
+        dlg = tk.Toplevel(self)
+        dlg.title("Delete perforations")
+        dlg.resizable(False, False)
+        dlg.grab_set()
+
+        ttk.Label(dlg, text="Select perforations to remove:").pack(
+            anchor=tk.W, padx=12, pady=(10, 4))
+
+        frame = ttk.Frame(dlg)
+        frame.pack(padx=12, pady=4, fill=tk.BOTH)
+
+        checks = {}
+        for value in PERFORATIONS:
+            var = tk.BooleanVar()
+            ttk.Checkbutton(frame, text=value, variable=var).pack(anchor=tk.W)
+            checks[value] = var
+
+        btn_frame = ttk.Frame(dlg)
+        btn_frame.pack(padx=12, pady=(8, 12), fill=tk.X)
+
+        def on_delete():
+            to_remove = [v for v, var in checks.items() if var.get()]
+            if not to_remove:
+                messagebox.showwarning("Delete perforations",
+                                       "No perforations selected.", parent=dlg)
+                return
+            for v in to_remove:
+                PERFORATIONS.remove(v)
+            _save_perforations(PERFORATIONS)
+            self.perf_combo.configure(values=PERFORATIONS)
+            dlg.destroy()
+
+        ttk.Button(btn_frame, text="Delete", command=on_delete).pack(side=tk.RIGHT, padx=(4, 0))
+        ttk.Button(btn_frame, text="Cancel", command=dlg.destroy).pack(side=tk.RIGHT)
+
     def help_about(self):
         messagebox.showinfo(
             "About Stamp Data Collector",
-            "Stamp Data Collector\nVersion 2.0\n\n"
+            "Stamp Data Collector\nVersion 2.1\n\n"
             "A desktop application for managing\n"
             "a personal stamp collection.\n\n"
             "Data is stored in XML format and\n"
@@ -190,9 +329,6 @@ class StampApp(tk.Tk):
         paned.add(right, weight=1)
 
         vcmd_int  = (self.register(lambda s: s == "" or s.isdigit()), "%P")
-        vcmd_perf = (self.register(
-            lambda s: s == "" or (all(c.isdigit() or c == "x" for c in s) and s.count("x") <= 1)
-        ), "%P")
 
         self.vars = {}
         for row, (label, key, wtype) in enumerate(FIELDS):
@@ -206,10 +342,9 @@ class StampApp(tk.Tk):
                 ttk.Entry(right, textvariable=var, width=30,
                           validate="key", validatecommand=vcmd_int).grid(
                     row=row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
-            elif wtype == "entry_perf":
-                ttk.Entry(right, textvariable=var, width=30,
-                          validate="key", validatecommand=vcmd_perf).grid(
-                    row=row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
+            elif wtype == "combo_perf":
+                self.perf_combo = ttk.Combobox(right, textvariable=var, values=PERFORATIONS, width=28, state="readonly")
+                self.perf_combo.grid(row=row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
             elif wtype == "combo_country":
                 self.country_combo = ttk.Combobox(right, textvariable=var, values=COUNTRIES, width=28)
                 self.country_combo.grid(row=row, column=1, sticky=tk.EW, padx=(8, 0), pady=3)
@@ -433,15 +568,6 @@ class StampApp(tk.Tk):
             names = ", ".join(labels[f] for f in missing)
             messagebox.showwarning("Validation", f"Required field(s) missing: {names}")
             return
-        perf = stamp.get("perforations", "")
-        if perf:
-            try:
-                perf_val = float(perf)
-                if not (7 <= perf_val <= 16.5):
-                    raise ValueError
-            except ValueError:
-                messagebox.showwarning("Validation", "Perforations must be a number between 7 and 16.5.")
-                return
         if self.selected_index is not None:
             # Preserve the original creation timestamp on edit
             stamp["created"] = self.stamps[self.selected_index].get("created", "")

@@ -50,6 +50,19 @@ python stamp_collector.py
 
 ---
 
+## Edit Menu
+
+| Action | Description |
+|---|---|
+| **Add new country…** | Add a custom country name to the country dropdown |
+| **Delete countries…** | Open a scrollable checklist to remove countries from the list |
+| **Add new perforation…** | Add a custom perforation value to the perforations dropdown |
+| **Delete perforations…** | Open a checklist to remove perforation values from the list |
+
+Changes to the country and perforation lists are saved immediately and persist across sessions.
+
+---
+
 ## Managing Stamps
 
 ### Adding a stamp
@@ -76,7 +89,7 @@ python stamp_collector.py
 | **Country** | Yes | Select from the dropdown list |
 | **Denomination** | No | Free text (e.g. `2c`, `0.50`) |
 | **Condition** | Yes | Select from the dropdown list |
-| **Perforations** | No | Float between 7 and 16.5 (e.g. `11`, `13.5`) |
+| **Perforations** | No | Select from the dropdown list (e.g. `12x12`, `Imperf.`) |
 | **Watermark** | No | Integer code only (e.g. `7`) |
 | **Catalog** | No | Select type (Scott, Stanley Gibbons, Michel) and enter catalog number |
 | **Watermark image** | No | Image file attached via Browse button (PNG, JPG, etc.) |
@@ -92,7 +105,7 @@ python stamp_collector.py
 ## Input Rules
 
 - **Code** and **Watermark** fields only accept digits — letters and symbols are blocked at input.
-- **Perforations** accepts a decimal number between 7 and 16.5 (e.g. `11`, `13.5`). The field may be left empty.
+- **Perforations** is a dropdown — choose from the list or leave it empty. Custom values can be added via **Edit → Add new perforation…**.
 - Required fields (**Code**, **Country**, **Condition**, **Color(s)**) must be filled before a record can be saved.
 
 ---

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="stamp-data-collector",
-    version="2.0",
+    version="2.1",
     description="Desktop application for managing a personal stamp collection",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
@@ -13,7 +13,7 @@ setup(
         "Pillow>=9.0",
     ],
     data_files=[
-        ("", ["countries.json"]),
+        ("", ["countries.json", "perforations.json"]),
     ],
     entry_points={
         "console_scripts": [

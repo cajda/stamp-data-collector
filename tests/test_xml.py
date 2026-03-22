@@ -17,7 +17,7 @@ def sample_stamps():
     return [
         {
             "code": "1", "country": "Poland", "denomination": "1 zl",
-            "condition": "Fine", "perforations": "11x14", "watermark": "100",
+            "condition": "Fine", "perforations": "12x12", "watermark": "100",
             "catalog_type": "Scott (Sn)", "catalog_number": "42",
             "colors": "red, blue", "watermark_image": "", "stamp_image": "",
             "notes": "test note", "created": "2026-01-01 10:00:00",

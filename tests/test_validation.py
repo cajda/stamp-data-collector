@@ -6,7 +6,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest
-from stamp_collector import REQUIRED_FIELDS, COUNTRIES, CONDITIONS
+from stamp_collector import REQUIRED_FIELDS, COUNTRIES, CONDITIONS, PERFORATIONS
 
 
 def validate_stamp(stamp: dict) -> list[str]:
@@ -22,10 +22,8 @@ def validate_stamp(stamp: dict) -> list[str]:
         errors.append("Code must be a positive integer")
 
     perf = stamp.get("perforations", "")
-    if perf:
-        parts = perf.split("x")
-        if len(parts) != 2 or not parts[0].isdigit() or not parts[1].isdigit():
-            errors.append("Perforations must be in NxM format (e.g. 11x14)")
+    if perf and perf not in PERFORATIONS:
+        errors.append(f"Perforations must be one of: {PERFORATIONS}")
 
     country = stamp.get("country", "")
     if country and country not in COUNTRIES:
@@ -47,7 +45,7 @@ def valid_stamp():
         "country": "Poland",
         "denomination": "1 zl",
         "condition": "MNH-VF",
-        "perforations": "11x14",
+        "perforations": "12x12",
         "watermark": "",
         "colors": "red, blue",
         "notes": "",
@@ -89,8 +87,8 @@ def test_code_invalid_non_integer(valid_stamp, code):
 
 # ── Perforations validation ───────────────────────────────────────────────────
 
-@pytest.mark.parametrize("perf", ["11x14", "12x12", "10x10"])
-def test_perforations_valid_format(valid_stamp, perf):
+@pytest.mark.parametrize("perf", PERFORATIONS)
+def test_perforations_valid_values(valid_stamp, perf):
     valid_stamp["perforations"] = perf
     assert validate_stamp(valid_stamp) == []
 
@@ -100,8 +98,8 @@ def test_perforations_empty_is_optional(valid_stamp):
     assert validate_stamp(valid_stamp) == []
 
 
-@pytest.mark.parametrize("perf", ["11 x 14", "11x", "x14", "abc", "11-14", "11x14x15"])
-def test_perforations_invalid_format(valid_stamp, perf):
+@pytest.mark.parametrize("perf", ["11x14", "10x10", "abc", "11-14"])
+def test_perforations_invalid_value(valid_stamp, perf):
     valid_stamp["perforations"] = perf
     errors = validate_stamp(valid_stamp)
     assert any("Perforations" in e for e in errors)

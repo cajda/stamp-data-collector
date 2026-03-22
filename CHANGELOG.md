@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1] — 2026-03-22
+
+### Changed
+- **Perforations field** changed from a free-text entry to a dropdown (Combobox) with a fixed list of valid values: `Imperf.`, `12x12`, `13x13`, `14x14`, `13¾x14`, `12½x13`, `14x13¼`.
+- Perforation list is now persisted in `perforations.json` so user-added values survive restarts.
+
+### Added
+- **Edit → Add new perforation…** — adds a custom perforation value to the list.
+- **Edit → Delete perforations…** — opens a dialog with checkboxes to remove one or more perforation values from the list.
+- **Edit → Delete countries…** — opens a scrollable dialog with checkboxes to remove one or more countries from the list.
+
+---
+
 ## [2.0] — 2026-03-18
 
 ### Added
